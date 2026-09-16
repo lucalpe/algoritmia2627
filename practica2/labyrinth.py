@@ -16,16 +16,17 @@ def read_data(f: TextIO) -> Data:
     cols = int(f.readline())
     return rows, cols
 def process(data: Data) -> Result:
-    # Paso 1
+    # Paso 1 Creamos todos los vertices posibles a partir de las filas y columnas iniciales
     rows, cols = data
     vertices = [(row, column) for row in range(rows) for column in range(cols)]
 
-    # Paso 2
+    # Paso 2 Creamos un MergeFindSet donde añadimos todos estos vertices
     mfs = MergeFindSet()
     for vertice in vertices:
         mfs.add(vertice)
 
-    # Paso 3
+    # Paso 3 Creamos todos los edges posibles.
+    # Lo hacemos creando vertices entre el vertice actual y el de la derecha y el de abajo
     all_edges = []
     for row, col in vertices:
         if row + 1 < rows:
@@ -34,19 +35,13 @@ def process(data: Data) -> Result:
             all_edges.append(((row, col), (row, col + 1)))
     shuffle(all_edges)
 
-    # Paso 4
+    # Paso 5 Creamos los pasillos teniendo en cuenta la clase del set para que no hayan ciclos
     corridors = []
-
-    # Paso 5
-    a_d_c = 200
     for v1, v2 in all_edges:
         if mfs.find(v1) != mfs.find(v2):
             mfs.merge(v1, v2)
             corridors.append((v1, v2))
-        else:
-            if a_d_c > 0:
-                corridors.append((v1, v2))
-                a_d_c -= 1
+
 
     return UndirectedGraph(E = corridors)
 
